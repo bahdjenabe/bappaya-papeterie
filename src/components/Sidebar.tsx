@@ -14,7 +14,7 @@ export default function Sidebar() {
   const isActive = (href: string) => pathname === href;
 
   const menuItems = [
-    { href: "/dashboard", label: " Tableau de bord" },
+    { href: "/dashboard", label: "📊 Tableau de bord" },
     { href: "/dashboard/stock", label: "📦 Stock" },
     { href: "/dashboard/sales", label: "💰 Ventes" },
     // 🔥 affiché seulement si admin
