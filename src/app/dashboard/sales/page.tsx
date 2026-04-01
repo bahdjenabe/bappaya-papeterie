@@ -484,46 +484,48 @@ export default function SalesPage() {
             </tr>
           </thead>
           <tbody>
-            {ventesPaginees.map((v) => (
-              <tr key={v.id} className="border-b hover:bg-blue-50">
-                <td className="p-3">{v.nomProduit}</td>
-                <td className="p-3">{v.quantiteVendue}</td>
-                <td className="p-3">{v.prixUnitaire} GNF</td>
-                <td className="p-3 font-semibold">{v.montantTotal} GNF</td>
-                <td className="p-3 font-semibold">{v.montantPaye} GNF</td>
-                <td className="p-3 font-semibold">{v.soldeRestant} GNF</td>
-                <td className="p-3">
-                  {v.dateVente.toDate().toLocaleString("fr-FR")}
-                </td>
-                <td className="p-3 flex justify-center gap-3">
-                  <button
-                    onClick={() => generateInvoice(v)}
-                    className="text-green-600"
-                  >
-                    <FileText size={18} />
-                  </button>
+            {ventesPaginees.map((v) => {
+              return (
+                <tr key={v.id} className="border-b hover:bg-blue-50">
+                  <td className="p-3">{v.nomProduit}</td>
+                  <td className="p-3">{v.quantiteVendue}</td>
+                  <td className="p-3">{v.prixUnitaire} GNF</td>
+                  <td className="p-3 font-semibold">{v.montantTotal} GNF</td>
+                  <td className="p-3 font-semibold">{v.montantPaye} GNF</td>
+                  <td className="p-3 font-semibold">{v.soldeRestant} GNF</td>
+                  <td className="p-3">
+                    {v.dateVente.toDate().toLocaleString("fr-FR")}
+                  </td>
+                  <td className="p-3 flex justify-center gap-3">
+                    <button
+                      onClick={() => generateInvoice(v)}
+                      className="text-green-600"
+                    >
+                      <FileText size={18} />
+                    </button>
 
-                  <button
-                    onClick={() => {
-                      setEditingVente(v);
-                      setSelectedProduitId(v.produitId);
-                      setQuantite(v.quantiteVendue);
-                      setMontantPaye(v.montantPaye); // préremplir
-                    }}
-                    className="text-blue-500"
-                  >
-                    <Pencil size={18} />
-                  </button>
+                    <button
+                      onClick={() => {
+                        setEditingVente(v);
+                        setSelectedProduitId(v.produitId);
+                        setQuantite(v.quantiteVendue);
+                        setMontantPaye(v.montantPaye);
+                      }}
+                      className="text-blue-500"
+                    >
+                      <Pencil size={18} />
+                    </button>
 
-                  <button
-                    onClick={() => handleDeleteClick(v)}
-                    className="text-red-500"
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                </td>
-              </tr>
-            ))}
+                    <button
+                      onClick={() => handleDeleteClick(v)}
+                      className="text-red-500"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

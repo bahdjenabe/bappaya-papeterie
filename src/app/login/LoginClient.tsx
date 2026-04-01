@@ -2,9 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import {
+  signInWithEmailAndPassword,
+  setPersistence,
+  browserSessionPersistence,
+} from "firebase/auth";
 import { auth } from "@/lib/firebase";
-import { setPersistence, browserSessionPersistence } from "firebase/auth";
 // import Image from "next/image";
 
 export default function LoginPage() {
@@ -18,10 +21,14 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // ✅ IMPORTANT : session supprimée quand navigateur fermé
+      // ✅ session supprimée quand navigateur fermé
       await setPersistence(auth, browserSessionPersistence);
 
       await signInWithEmailAndPassword(auth, email, password);
+
+      // ✅ AJOUT (sécurité session)
+      localStorage.setItem("loginTime", Date.now().toString());
+      localStorage.setItem("lastActivity", Date.now().toString());
 
       router.push(redirect); // redirige vers la page demandée
     } catch {

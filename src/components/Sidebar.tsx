@@ -1,14 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
+import { useEffect } from "react";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { auth } from "@/lib/firebase";
 
 /**
  * Sidebar simplifiée pour BappayaPapeterie
  */
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { userData } = useRequireAuth(); // 🔥 récupération rôle
 
   const isActive = (href: string) => pathname === href;
@@ -17,12 +21,57 @@ export default function Sidebar() {
     { href: "/dashboard", label: "📊 Tableau de bord" },
     { href: "/dashboard/stock", label: "📦 Stock" },
     { href: "/dashboard/sales", label: "💰 Ventes" },
-    // 🔥 affiché seulement si admin
     ...(userData?.role === "admin"
       ? [{ href: "/dashboard/users", label: "👥 Utilisateurs" }]
       : []),
     { href: "/dashboard/reports", label: "📈 Rapports" },
   ];
+
+  // 🔥 Vérification session (AJOUT)
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        router.push("/login");
+        return;
+      }
+
+      const now = Date.now();
+      const loginTime = localStorage.getItem("loginTime");
+      const lastActivity = localStorage.getItem("lastActivity");
+
+      const MAX_DURATION = 8 * 60 * 60 * 1000; // 8h
+      const MAX_IDLE = 2 * 60 * 60 * 1000; // 2h
+
+      if (!loginTime || now - parseInt(loginTime) > MAX_DURATION) {
+        signOut(auth);
+        router.push("/login");
+        return;
+      }
+
+      if (lastActivity && now - parseInt(lastActivity) > MAX_IDLE) {
+        signOut(auth);
+        router.push("/login");
+        return;
+      }
+    });
+
+    return () => unsubscribe();
+  }, [router]);
+
+  // 🔥 Mise à jour activité (AJOUT)
+  useEffect(() => {
+    const updateActivity = () => {
+      localStorage.setItem("lastActivity", Date.now().toString());
+    };
+
+    window.addEventListener("click", updateActivity);
+    window.addEventListener("keydown", updateActivity);
+
+    return () => {
+      window.removeEventListener("click", updateActivity);
+      window.removeEventListener("keydown", updateActivity);
+    };
+  }, []);
 
   return (
     <aside className="w-64 min-h-screen bg-gradient-to-b from-blue-100 via-blue-50 to-white border-r border-blue-100 shadow-sm hidden lg:flex flex-col">
